@@ -12,6 +12,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 #endregion
@@ -93,8 +94,65 @@ namespace AweEditor
         private void ImportVoxelTerrainMenuClicked(object sender, EventArgs e)
         {
             // TODO: Import the file
+            OpenFileDialog fd = new OpenFileDialog();
+
+            fd.InitialDirectory = ContentPath();
+
+            fd.Title = "Import Image";
+
+            fd.Filter = "Minecraft Files (*.schematic; *.nbt; *.mcr; *.mca)|*.schematic;*.nbt;*.mcr;*.mca|" +
+                                "All Files (*.*)|*.*";
+
+            if (fd.ShowDialog() == DialogResult.OK)
+            {
+                LoadTerrain(fd.FileName);
+            }
         }
 
+        /// <summary>
+        /// Loads a new 3D Terrain from a Minecraft Schematic File.
+        /// </summary>
+        void LoadTerrain(string fileName)
+        {
+            Cursor = Cursors.WaitCursor;
+
+            // Switch to the Model tab pane
+            tabControl1.SelectedIndex = 3;
+
+            // Unload any existing model.
+            terrainViewerControl.VoxelTerrain = null;
+            contentManager.Unload();
+
+            contentBuilder.Clear();
+            contentBuilder.Add(ContentPath() + @"\Cats.fbx", "Model", null, "ModelProcessor");
+
+            string buildError = contentBuilder.Build();
+
+            //try
+            //{
+            //TODO: Delete
+            VoxelTerrainImporter.SetStatus(txtWorldStatus);
+            txtWorldStatus.Text = "";
+            /*txtWorldStatus.Text =*/
+            terrainViewerControl.VoxelTerrain = VoxelTerrainImporter.LoadTerrain(fileName);
+            // }
+            // catch(Exception e)
+            // {
+            // If the build failed, display an error message.
+            //  MessageBox.Show("An error occurred while loading the terrain:\n" + e.Message, "Error");
+            //}
+
+            if (string.IsNullOrEmpty(buildError))
+            {
+                terrainViewerControl.Model = contentManager.Load<Model>("Model");
+            }
+            else
+            {
+                MessageBox.Show(buildError, "Error");
+            }
+
+            Cursor = Cursors.Arrow;
+        }
 
         /// <summary>
         /// Loads a new 3D model file into the ModelViewerControl.

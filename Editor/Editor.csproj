@@ -80,6 +80,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Datatypes\VoxelTerrain.cs" />
+    <Compile Include="Services\VoxelTerrainImporter.cs" />
     <Compile Include="Utilities\ContentBuilder.cs" />
     <Compile Include="Controls\TerrainViewerControl.cs">
       <SubType>Component</SubType>
